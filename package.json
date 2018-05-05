@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "yarn jest",
-    "start": "yarn build && node lib/index.js",
-    "build": "babel src --out-dir lib"
+    "test": "yarn jest --notify",
+    "start": "yarn -s build && node lib/index.js",
+    "build": "babel -q src --out-dir lib",
+    "watch": "yarn test --watch"
   },
   "keywords": [],
   "license": "ISC",

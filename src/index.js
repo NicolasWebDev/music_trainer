@@ -1,41 +1,11 @@
 import 'babel-polyfill'
-import tmp from 'tmp'
-import scribble from 'scribbletune'
-import { exec } from 'child_process'
 import readline from 'readline'
-import _ from 'lodash'
-
-const POSSIBLE_NOTES = (
-  'b3' +
-  ' c4 c#4 d4 d#4 e4 f4 f#4 g4 g#4 a4 a#4 b4' +
-  ' c5 c#5 d5 d#5 e5 f5 f#5 g5 g#5 a5 a#5 b5' +
-  ' c6 c#6 d6 d#6'
-).split(' ')
+import MusicPlayer from './MusicPlayer'
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 })
-
-const randomNote = () => _.sampleSize(POSSIBLE_NOTES)[0]
-
-const randomClip = (numberOfNotes) => scribble.clip({
-  notes: randomPhrase(numberOfNotes),
-  pattern: 'x_x_x_--'.repeat(8)
-})
-
-const randomPhrase = (numberOfNotes) => _.times(numberOfNotes, randomNote)
-
-const clip = scribble.clip({
-  notes: 'F#m C#m Dmaj Bm Emaj Amaj Dmaj C#m Amaj',
-  pattern: 'x_x_x_--'.repeat(8)
-})
-
-const playClip = (clip) => {
-  const temporaryFileName = tmp.fileSync().name
-  scribble.midi(clip, temporaryFileName)
-  exec(`timidity ${temporaryFileName}`)
-}
 
 const ask = (promptMessage) => new Promise(
   (resolve, reject) => {
@@ -43,10 +13,30 @@ const ask = (promptMessage) => new Promise(
   }
 )
 
-const main = async () => {
-  const nbNotes = await ask('Number of notes in the phrase')
+const applyAction = (action, nbNotes, lastPhrase) => {
+  switch (action) {
+    case 'r':
+      return MusicPlayer.play(lastPhrase)
+    case 'n':
+      return MusicPlayer.playRandomPhrase(nbNotes)
+    case 'q':
+      console.log('Chao')
+      process.exit()
+    default:
+      console.log(`Error: the action ${action} is not recognized`)
+      return lastPhrase
+  }
 }
 
-// main()
+const main = async () => {
+  const nbNotes = await ask('Number of notes in the phrase')
+  let playedPhrase = MusicPlayer.playRandomPhrase(nbNotes)
+  while (true) {
+    const action = await ask('Action ([r]epeat, [n]ew phrase, [q]uit)')
+    playedPhrase = applyAction(action, nbNotes, playedPhrase)
+  }
+}
 
-export { randomNote, randomPhrase }
+main()
+  .then(() => {}, error => { console.log(error) })
+  .then(() => process.exit())
