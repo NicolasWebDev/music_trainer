@@ -22,6 +22,7 @@
     "jest": "^22.4.3"
   },
   "dependencies": {
+    "lodash": "^4.17.10",
     "scribbletune": "^0.11.2",
     "tmp": "^0.0.33"
   }
