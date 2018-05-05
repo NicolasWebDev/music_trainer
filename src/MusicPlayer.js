@@ -20,9 +20,7 @@ export default class MusicPlayer {
   }
 
   static playRandomPhrase (numberOfNotes) {
-    const phrase = this.randomPhrase(numberOfNotes)
-    this.play(phrase)
-    return phrase
+    return this.play(this.randomPhrase(numberOfNotes))
   }
 
   static randomPhrase (numberOfNotes) {
